@@ -10,6 +10,7 @@ const initialState = {
   questions: [],
   // 'loading', 'error', 'ready', 'active', 'finished'
   status: "loading",
+  index: 0,
 };
 const reducer = (state, action) => {
   switch (action.type) {
@@ -25,7 +26,10 @@ const reducer = (state, action) => {
 };
 
 function App() {
-  const [{ questions, status }, dispatch] = useReducer(reducer, initialState);
+  const [{ questions, status, index }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
   const numQuestions = questions.length;
 
   useEffect(() => {
@@ -46,7 +50,7 @@ function App() {
             dispatch={() => dispatch({ type: "start" })}
           />
         )}
-        {status === "active" && <Question />}
+        {status === "active" && <Question question={questions[index]} />}
       </Main>
     </div>
   );
