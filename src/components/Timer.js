@@ -3,8 +3,9 @@ import { useQuiz } from "../contexts/QuizContext";
 
 function Timer() {
   const { dispatch, secondsRemaining } = useQuiz();
-  const minutes = Math.floor(secondsRemaining / 60);
-  const seconds = secondsRemaining % 60;
+
+  const minutes = Math.floor((secondsRemaining ?? 0) / 60);
+  const seconds = (secondsRemaining ?? 0) % 60;
 
   useEffect(() => {
     const id = setInterval(() => {
