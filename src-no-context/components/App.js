@@ -10,7 +10,6 @@ import Progress from "./Progress";
 import FinishScreen from "./FinishScreen";
 import Footer from "./Footer";
 import Timer from "./Timer";
-import { QuizProvider } from "../contexts/QuizContext";
 
 const SECONDSPERQUESTION = 30;
 
@@ -87,7 +86,7 @@ function App() {
   const numQuestions = questions.length;
   const maxPossiblePoints = questions.reduce(
     (prev, cur) => prev + cur.points,
-    0,
+    0
   );
 
   useEffect(() => {
@@ -96,47 +95,51 @@ function App() {
       .then((data) => dispatch({ type: "dataReceived", payload: data }))
       .catch((err) => dispatch({ type: "dataFailed" }));
   }, []);
-
-  const contextValue = { dispatch, answer, secondsRemaining };
-
   return (
     <div className="app">
       <Header />
       <Main>
-        <QuizProvider value={contextValue}>
-          {status === "loading" && <Loader />}
-          {status === "error" && <Error />}
-          {status === "ready" && (
-            <StartScreen
+        {status === "loading" && <Loader />}
+        {status === "error" && <Error />}
+        {status === "ready" && (
+          <StartScreen
+            numQuestions={numQuestions}
+            dispatch={() => dispatch({ type: "start" })}
+          />
+        )}
+        {status === "active" && (
+          <>
+            <Progress
+              index={index + 1}
               numQuestions={numQuestions}
-              dispatch={() => dispatch({ type: "start" })}
-            />
-          )}
-          {status === "active" && (
-            <>
-              <Progress
-                index={index + 1}
-                numQuestions={numQuestions}
-                points={points}
-                maxPossiblePoints={maxPossiblePoints}
-                answer={answer}
-              />
-              <Question question={questions[index]} />
-              <Footer>
-                <Timer />
-                <NextButton index={index} numQuestions={numQuestions} />
-              </Footer>
-            </>
-          )}
-          {status === "finished" && (
-            <FinishScreen
               points={points}
               maxPossiblePoints={maxPossiblePoints}
-              highScore={highScore}
-              dispatch={dispatch}
+              answer={answer}
             />
-          )}
-        </QuizProvider>
+            <Question
+              question={questions[index]}
+              dispatch={dispatch}
+              answer={answer}
+            />
+            <Footer>
+              <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
+              <NextButton
+                dispatch={dispatch}
+                answer={answer}
+                index={index}
+                numQuestions={numQuestions}
+              />
+            </Footer>
+          </>
+        )}
+        {status === "finished" && (
+          <FinishScreen
+            points={points}
+            maxPossiblePoints={maxPossiblePoints}
+            highScore={highScore}
+            dispatch={dispatch}
+          />
+        )}
       </Main>
     </div>
   );
